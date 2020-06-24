@@ -1,7 +1,63 @@
+<?php
+    require_once "vendor/autoload.php";
+
+    MercadoPago\SDK::setAccessToken("APP_USR-6718728269189792-112017-dc8b338195215145a4ec035fdde5cedf-491494389");
+    MercadoPago\SDK::setIntegratorId("dev_24c65fb163bf11ea96500242ac130004");
+    $preference = new MercadoPago\Preference();
+    $payer = new MercadoPago\Payer();
+    $payer->name = "Lalo";
+    $payer->surname = "Landa";
+    $payer->email = "test_user_58295862@testuser.com";
+    $payer->phone = array(
+        "area_code" => "52",
+        "number" => "5549737300"
+    );
+
+    $payer->address = array(
+        "street_name" => "Insurgentes Sur",
+        "street_number" => 1602,
+        "zip_code" => "03940"
+    );
+    $preference->payer = $payer;
+
+    $item = new MercadoPago\Item();
+    $item->id ="1234";
+    $item->title = $_POST['title'];
+    $item->description = "Dispositivo móvil de Tienda e-commerce";
+    $item->picture_url = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0dSz8_NynSKxquT_zK3kFbGCw3AqwBvdQZLwaQAMy0wLEzyMcWfxRO_tm_Jial5W61wiYoSWg&usqp=CAc";
+
+    $item->quantity = 1;
+    $item->unit_price = $_POST['price'];
+    $preference->items = array($item);
+    $preference->external_reference = "aldo13perez@gmail.com";
+    
+    $preference->payment_methods = array(
+        "excluded_payment_methods" => array(
+            array("id" => "amex")
+        ),
+        "excluded_payment_types" => array(
+            array("id" => "atm")
+        ),
+        "installments" => 6
+    );
+
+    $preference->back_urls = array(
+    "success" => "https://www.tu-sitio/success",
+    "failure" => "http://www.tu-sitio/failure",
+    "pending" => "http://www.tu-sitio/pending"
+    );
+    $preference->auto_return = "approved";
+   
+    $preference->notification_url = "http://selling.serveftp.com/ApiPruebas/api/MercadoPago";
+    $preference->save();
+?>
+
 <!DOCTYPE html>
 <html class="supports-animation supports-columns svg no-touch no-ie no-oldie no-ios supports-backdrop-filter as-mouseuser" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
     
-    <meta name="viewport" content="width=1024">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>Tienda e-commerce</title>
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -11,6 +67,8 @@
     src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
     crossorigin="anonymous"></script>
+
+    <script src="https://www.mercadopago.com/v2/security.js" view="item"></script>
 
     <link rel="stylesheet" href="./assets/category-landing.css" media="screen, print">
 
@@ -42,6 +100,7 @@
 
 
 <body class="as-theme-light-heroimage">
+
 
     <div class="stack">
         
@@ -129,8 +188,26 @@
                                         <h3 >
                                             <?php echo "$" . $_POST['unit'] ?>
                                         </h3>
+                                        <h3>
+                                            <?php echo $preference->id; ?>
+                                        </h3>
                                     </div>
-                                    <button type="submit" class="mercadopago-button" formmethod="post">Pagar</button>
+
+
+                                    <!--form action="<?php echo $preference->init_point; ?>" method="POST">
+                                      <script
+                                       src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
+                                       data-preference-id="<?php echo $preference->id; ?>">
+                                      </script>
+                                    </form-->
+                                    <form action="<?php echo $preference->init_point; ?>" method="get">
+                                            <input type="hidden" name="img" value="./assets/samsung-galaxy-s9-xxl.jpg">
+                                            <input type="hidden" name="title" value="Samsung Galaxy S9">
+                                            <input type="hidden" name="price" value="15000">
+                                            <input type="hidden" name="unit" value="1">
+                                            <button type="submit" class="mercadopago-button" formmethod="post">Pagar la compra</button>
+                                    </form>
+                                    <a href="<?php echo $preference->init_point; ?>">Pagar la compra</a>
                                 </div>
                             </div>
                         </div>
